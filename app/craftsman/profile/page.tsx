@@ -21,7 +21,7 @@ import {
   MapPin,
   Briefcase,
   Award,
-  Yen,
+  JapaneseYen,
   Image,
   ExternalLink,
 } from "lucide-react";
