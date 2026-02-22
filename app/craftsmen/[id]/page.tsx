@@ -100,7 +100,7 @@ export default async function CraftsmanDetailPage({ params }: PageProps) {
                     <Link href={`/craftsmen/${id}/book`}>
                       <Button size="lg" className="w-full sm:w-auto">
                         <Calendar className="mr-2 h-4 w-4" />
-                        予約する
+                        施工依頼する
                       </Button>
                     </Link>
                   </div>
@@ -211,7 +211,7 @@ export default async function CraftsmanDetailPage({ params }: PageProps) {
                     この職人に依頼しますか？
                   </p>
                   <Link href={`/craftsmen/${id}/book`}>
-                    <Button className="mt-3 w-full">予約に進む</Button>
+                    <Button className="mt-3 w-full">施工依頼に進む</Button>
                   </Link>
                 </CardContent>
               </Card>

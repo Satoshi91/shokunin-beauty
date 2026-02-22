@@ -2,7 +2,7 @@
  * MockAPI.io シードスクリプト
  * 
  * 使い方:
- * 1. mockapi.io で craftsmen, services, reviews リソースを作成
+ * 1. mockapi.io で craftsmen, services, reviews, jobs リソースを作成
  * 2. node scripts/seed.mjs を実行
  */
 
@@ -235,6 +235,90 @@ const reviews = [
   },
 ];
 
+// 施工依頼（Job）データ
+const jobs = [
+  {
+    craftsman_id: "1",
+    craftsman_name: "山田エアコンサービス",
+    customer_id: "demo_customer_1",
+    customer_name: "山本太郎",
+    customer_phone: "090-1234-5678",
+    customer_email: "yamamoto@example.com",
+    customer_address: "東京都渋谷区道玄坂1-2-3 ABCマンション101",
+    service: "エアコン取り付け",
+    preferred_date: "2026-02-25",
+    preferred_time: "10:00",
+    notes: "リビングに取り付け希望です。室外機は既存の配管を使用したいです。",
+    status: "pending",
+    created_at: "2026-02-20T10:30:00Z",
+    confirmed_at: null,
+  },
+  {
+    craftsman_id: "1",
+    craftsman_name: "山田エアコンサービス",
+    customer_id: "demo_customer_2",
+    customer_name: "佐藤花子",
+    customer_phone: "080-9876-5432",
+    customer_email: "sato@example.com",
+    customer_address: "東京都渋谷区神南1-5-6",
+    service: "エアコンクリーニング",
+    preferred_date: "2026-02-28",
+    preferred_time: "14:00",
+    notes: "3年間掃除していないので、カビ臭いです。",
+    status: "confirmed",
+    created_at: "2026-02-18T09:15:00Z",
+    confirmed_at: "2026-02-18T15:00:00Z",
+  },
+  {
+    craftsman_id: "2",
+    craftsman_name: "佐藤設備工業",
+    customer_id: "demo_customer_1",
+    customer_name: "山本太郎",
+    customer_phone: "090-1234-5678",
+    customer_email: "yamamoto@example.com",
+    customer_address: "東京都新宿区西新宿2-8-1",
+    service: "水漏れ修理",
+    preferred_date: "2026-02-22",
+    preferred_time: "09:00",
+    notes: "キッチンの蛇口から水漏れしています。",
+    status: "completed",
+    created_at: "2026-02-15T14:20:00Z",
+    confirmed_at: "2026-02-15T16:00:00Z",
+  },
+  {
+    craftsman_id: "3",
+    craftsman_name: "鈴木電気工事",
+    customer_id: "demo_customer_3",
+    customer_name: "高橋健一",
+    customer_phone: "070-1111-2222",
+    customer_email: "takahashi@example.com",
+    customer_address: "東京都世田谷区三軒茶屋1-1-1",
+    service: "コンセント増設",
+    preferred_date: "2026-03-01",
+    preferred_time: "11:00",
+    notes: "リビングにコンセントを2口増設したいです。",
+    status: "pending",
+    created_at: "2026-02-21T11:00:00Z",
+    confirmed_at: null,
+  },
+  {
+    craftsman_id: "4",
+    craftsman_name: "田中内装リフォーム",
+    customer_id: "demo_customer_2",
+    customer_name: "佐藤花子",
+    customer_phone: "080-9876-5432",
+    customer_email: "sato@example.com",
+    customer_address: "東京都目黒区自由が丘2-3-4",
+    service: "壁紙張替え",
+    preferred_date: "2026-03-05",
+    preferred_time: "09:00",
+    notes: "6畳の寝室の壁紙を張り替えたいです。シンプルな白系希望。",
+    status: "rejected",
+    created_at: "2026-02-19T08:45:00Z",
+    confirmed_at: null,
+  },
+];
+
 async function seedData(endpoint, data, name) {
   console.log(`\n📦 ${name} をシード中...`);
   
@@ -252,7 +336,7 @@ async function seedData(endpoint, data, name) {
         console.error(`     ${text}`);
       } else {
         const result = await res.json();
-        console.log(`  ✅ 追加: ${result.id} - ${item.name || item.display_name || item.customer_name}`);
+        console.log(`  ✅ 追加: ${result.id} - ${item.name || item.display_name || item.service || item.customer_name}`);
       }
     } catch (error) {
       console.error(`  ❌ エラー: ${error.message}`);
@@ -267,7 +351,7 @@ async function main() {
   // リソースが存在するか確認
   console.log("\n📡 リソースの存在確認中...");
   
-  const endpoints = ["services", "craftsmen", "reviews"];
+  const endpoints = ["services", "craftsmen", "reviews", "jobs"];
   for (const endpoint of endpoints) {
     try {
       const res = await fetch(`${BASE_URL}/${endpoint}`);
@@ -288,6 +372,7 @@ async function main() {
   await seedData("services", services, "サービス");
   await seedData("craftsmen", craftsmen, "職人");
   await seedData("reviews", reviews, "レビュー");
+  await seedData("jobs", jobs, "施工依頼");
   
   console.log("\n✨ シード完了!");
 }

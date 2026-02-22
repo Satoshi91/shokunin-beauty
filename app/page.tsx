@@ -57,7 +57,7 @@ const steps = [
   },
   {
     step: 2,
-    title: "予約する",
+    title: "施工依頼する",
     description: "空き状況を確認して日時を選択",
     icon: Calendar,
   },
@@ -97,7 +97,7 @@ export default async function Home() {
               <p className="mt-6 text-lg text-blue-100 sm:text-xl">
                 エアコン取り付け、水回り修繕、電気工事など、
                 <br className="hidden sm:block" />
-                厳選された職人にオンラインで簡単予約
+                厳選された職人にオンラインで簡単依頼
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link href="/craftsmen">
@@ -113,7 +113,7 @@ export default async function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full border-white text-white hover:bg-white/10 sm:w-auto"
+                    className="w-full border-2 border-white bg-white/20 text-white hover:bg-white/30 sm:w-auto"
                   >
                     職人として登録
                   </Button>
@@ -189,7 +189,7 @@ export default async function Home() {
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-900">ご利用の流れ</h2>
               <p className="mt-4 text-lg text-gray-600">
-                かんたん4ステップで予約完了
+                かんたん4ステップで依頼完了
               </p>
             </div>
             <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

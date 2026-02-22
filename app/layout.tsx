@@ -9,10 +9,10 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "職人Beauty - 信頼できる職人に簡単予約",
+  title: "職人Beauty - 信頼できる職人に簡単依頼",
   description:
     "エアコン取り付け、水回り修繕、電気工事など、信頼できる職人に簡単に依頼できるプラットフォーム",
-  keywords: ["職人", "エアコン取り付け", "修繕", "リフォーム", "予約"],
+  keywords: ["職人", "エアコン取り付け", "修繕", "リフォーム", "施工依頼"],
 };
 
 export default function RootLayout({
