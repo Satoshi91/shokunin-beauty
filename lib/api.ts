@@ -2,6 +2,97 @@ import type { Craftsman, Service, Review, Job, CreateJobInput, JobStatus, Messag
 
 const BASE_URL = process.env.NEXT_PUBLIC_MOCKAPI_URL || "";
 
+// フォールバック用モックデータ（APIが利用できない場合）
+const FALLBACK_CRAFTSMEN: Craftsman[] = [
+  {
+    id: "1",
+    display_name: "山田 太郎",
+    description: "エアコン取り付け・クリーニング専門。20年以上の経験で丁寧な作業を心がけています。",
+    profile_image_url: "https://api.dicebear.com/7.x/personas/svg?seed=yamada",
+    prefecture: "東京都",
+    city: "渋谷区",
+    category: "エアコン",
+    price_min: 8000,
+    price_max: 25000,
+    rating_avg: 4.8,
+    review_count: 156,
+    experience_years: 20,
+    qualifications: "電気工事士2種、冷媒フロン類取扱技術者",
+  },
+  {
+    id: "2",
+    display_name: "佐藤 花子",
+    description: "水回りのトラブル解決のプロ。水漏れ、詰まり、何でもお任せください。",
+    profile_image_url: "https://api.dicebear.com/7.x/personas/svg?seed=sato",
+    prefecture: "東京都",
+    city: "新宿区",
+    category: "水回り",
+    price_min: 5000,
+    price_max: 30000,
+    rating_avg: 4.9,
+    review_count: 203,
+    experience_years: 15,
+    qualifications: "給水装置工事主任技術者",
+  },
+  {
+    id: "3",
+    display_name: "鈴木 一郎",
+    description: "電気工事全般対応。コンセント増設から分電盤交換まで。",
+    profile_image_url: "https://api.dicebear.com/7.x/personas/svg?seed=suzuki",
+    prefecture: "神奈川県",
+    city: "横浜市",
+    category: "電気",
+    price_min: 6000,
+    price_max: 50000,
+    rating_avg: 4.7,
+    review_count: 89,
+    experience_years: 12,
+    qualifications: "電気工事士1種、電気主任技術者3種",
+  },
+  {
+    id: "4",
+    display_name: "田中 美咲",
+    description: "壁紙・クロス張替えのスペシャリスト。お部屋の雰囲気を一新します。",
+    profile_image_url: "https://api.dicebear.com/7.x/personas/svg?seed=tanaka",
+    prefecture: "東京都",
+    city: "世田谷区",
+    category: "内装",
+    price_min: 10000,
+    price_max: 80000,
+    rating_avg: 4.6,
+    review_count: 67,
+    experience_years: 8,
+    qualifications: "内装仕上げ施工技能士1級",
+  },
+];
+
+const FALLBACK_REVIEWS: Review[] = [
+  {
+    id: "r1",
+    craftsman_id: "1",
+    customer_name: "M.K.",
+    rating: 5,
+    comment: "丁寧な作業で大満足です。説明もわかりやすかったです。",
+    created_at: "2026-02-15T10:00:00Z",
+  },
+  {
+    id: "r2",
+    craftsman_id: "1",
+    customer_name: "T.S.",
+    rating: 5,
+    comment: "時間通りに来ていただき、作業も早くて助かりました。",
+    created_at: "2026-02-10T14:00:00Z",
+  },
+  {
+    id: "r3",
+    craftsman_id: "2",
+    customer_name: "Y.H.",
+    rating: 5,
+    comment: "水漏れがすぐに直りました。対応が早くて感謝しています。",
+    created_at: "2026-02-18T09:00:00Z",
+  },
+];
+
 // デモ用モックジョブデータ（依頼者太郎用）
 // letで宣言してステータス更新を可能にする
 let DEMO_JOBS: Job[] = [
@@ -100,6 +191,27 @@ export interface GetCraftsmenParams {
 export async function getCraftsmen(
   params?: GetCraftsmenParams
 ): Promise<Craftsman[]> {
+  // APIが設定されていない場合はフォールバックデータを使用
+  if (!BASE_URL) {
+    let result = [...FALLBACK_CRAFTSMEN];
+    
+    if (params?.category) {
+      result = result.filter(c => c.category === params.category);
+    }
+    if (params?.prefecture) {
+      result = result.filter(c => c.prefecture === params.prefecture);
+    }
+    if (params?.sortBy) {
+      const order = params.order === "asc" ? 1 : -1;
+      result.sort((a, b) => {
+        const aVal = a[params.sortBy!];
+        const bVal = b[params.sortBy!];
+        return (Number(aVal) - Number(bVal)) * order;
+      });
+    }
+    return result;
+  }
+
   const searchParams = new URLSearchParams();
 
   if (params?.category) {
@@ -116,27 +228,76 @@ export async function getCraftsmen(
   const query = searchParams.toString();
   const endpoint = `/craftsmen${query ? `?${query}` : ""}`;
 
-  return fetchApi<Craftsman[]>(endpoint);
+  try {
+    return await fetchApi<Craftsman[]>(endpoint);
+  } catch {
+    return FALLBACK_CRAFTSMEN;
+  }
 }
 
 export async function getCraftsman(id: string): Promise<Craftsman> {
-  return fetchApi<Craftsman>(`/craftsmen/${id}`);
+  // APIが設定されていない場合はフォールバックデータを使用
+  if (!BASE_URL) {
+    const craftsman = FALLBACK_CRAFTSMEN.find(c => c.id === id);
+    if (craftsman) return craftsman;
+    throw new Error("Craftsman not found");
+  }
+
+  try {
+    return await fetchApi<Craftsman>(`/craftsmen/${id}`);
+  } catch {
+    const craftsman = FALLBACK_CRAFTSMEN.find(c => c.id === id);
+    if (craftsman) return craftsman;
+    throw new Error("Craftsman not found");
+  }
 }
 
 export async function updateCraftsman(id: string, data: UpdateCraftsmanInput): Promise<Craftsman> {
   return mutateApi<UpdateCraftsmanInput, Craftsman>(`/craftsmen/${id}`, "PUT", data);
 }
 
+const FALLBACK_SERVICES: Service[] = [
+  { id: "s1", name: "エアコン取り付け", category: "エアコン", icon: "AirVent" },
+  { id: "s2", name: "エアコンクリーニング", category: "エアコン", icon: "AirVent" },
+  { id: "s3", name: "水漏れ修理", category: "水回り", icon: "Droplet" },
+  { id: "s4", name: "トイレ修理", category: "水回り", icon: "Droplet" },
+  { id: "s5", name: "コンセント増設", category: "電気", icon: "Zap" },
+  { id: "s6", name: "照明交換", category: "電気", icon: "Zap" },
+  { id: "s7", name: "壁紙張替え", category: "内装", icon: "PaintBucket" },
+  { id: "s8", name: "フローリング補修", category: "内装", icon: "PaintBucket" },
+];
+
 export async function getServices(): Promise<Service[]> {
-  return fetchApi<Service[]>("/services");
+  if (!BASE_URL) {
+    return FALLBACK_SERVICES;
+  }
+  try {
+    return await fetchApi<Service[]>("/services");
+  } catch {
+    return FALLBACK_SERVICES;
+  }
 }
 
 export async function getReviews(craftsmanId: string): Promise<Review[]> {
-  return fetchApi<Review[]>(`/reviews?craftsman_id=${craftsmanId}`);
+  if (!BASE_URL) {
+    return FALLBACK_REVIEWS.filter(r => r.craftsman_id === craftsmanId);
+  }
+  try {
+    return await fetchApi<Review[]>(`/reviews?craftsman_id=${craftsmanId}`);
+  } catch {
+    return FALLBACK_REVIEWS.filter(r => r.craftsman_id === craftsmanId);
+  }
 }
 
 export async function getAllReviews(): Promise<Review[]> {
-  return fetchApi<Review[]>("/reviews");
+  if (!BASE_URL) {
+    return FALLBACK_REVIEWS;
+  }
+  try {
+    return await fetchApi<Review[]>("/reviews");
+  } catch {
+    return FALLBACK_REVIEWS;
+  }
 }
 
 export async function createJob(input: CreateJobInput): Promise<Job> {
